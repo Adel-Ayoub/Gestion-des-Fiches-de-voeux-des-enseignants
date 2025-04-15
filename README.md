@@ -46,7 +46,6 @@ After that, assuming a **Spring Boot with Maven** setup (adjust if using Gradle 
 | **`mvn test`** | none                   | Runs the tests within the project                                     |
 | **`mvn clean`** | none                   | Cleans the `/target` directory created by Maven                       |
 
-*(Note: Adjust table for Gradle (`./gradlew build`, `./gradlew bootRun`, `./gradlew test`, `./gradlew clean`) or Go (`go build`, `go run .`, `go test ./...`) if using those technologies)*
 
 ## Known Issues
 
