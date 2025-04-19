@@ -1,10 +1,16 @@
 package usthb.fi.fichevoeux.fichedevoeux;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Table(name = "FICHE_DE_VOEUX")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FicheDeVoeux {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
