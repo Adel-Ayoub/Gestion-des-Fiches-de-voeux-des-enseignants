@@ -13,7 +13,9 @@ import java.util.Set;
 @Repository
 public interface FicheDeVoeuxRepository extends JpaRepository<FicheDeVoeux, Long> {
 
-    Optional<FicheDeVoeux> findByTeacherIdAndAcademicYearAndSemester(Long teacherId, String academicYear, String semester);
+    //Optional<FicheDeVoeux> findByTeacherIdAndAcademicYearAndSemester(Long teacherId, String academicYear, String semester);
+
+    Optional<FicheDeVoeux> findByTeacherIdAndAcademicYear(Long teacherId, String academicYear);
 
     //List<FicheDeVoeux> findByTeacherIdSubmission(Long teacherId); find all previous teacher submission, we can have another one for a given year-semester
 

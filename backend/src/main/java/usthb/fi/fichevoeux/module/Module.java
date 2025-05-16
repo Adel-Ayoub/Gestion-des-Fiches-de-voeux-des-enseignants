@@ -1,6 +1,7 @@
 package usthb.fi.fichevoeux.module;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,13 @@ public class Module {
     @Column(name = "LEVEL")
     private String level;
 
+    @NotNull(message = "Semester number cannot be null")
+    @Column(name = "SEMESTER", nullable = false)
+    private int semester;
+
+    @Column(name = "HAS_TD")
+    private boolean hasTd = true;
+
+    @Column(name = "HAS_TP")
+    private boolean hasTp = true;
 }

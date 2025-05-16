@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 
 @Entity
 @Table(name = "FICHE_DE_VOEUX")
@@ -23,8 +25,8 @@ public class FicheDeVoeux {
     @Column(name = "ACADEMIC_YEAR", nullable = false)
     private String academicYear;
 
-    @Column(name = "SEMESTER", nullable = false)
-    private String semester;
+    /*@Column(name = "SEMESTER")
+    private String semester;*/
 
     @Column(name = "WANTS_SUPPLEMENTARY_HOURS_S1")
     private Integer wantsSupplementaryHoursS1;
@@ -37,4 +39,5 @@ public class FicheDeVoeux {
 
     @Column(name = "COMMENTS", columnDefinition = "TEXT")
     private String comments;
+
 }
