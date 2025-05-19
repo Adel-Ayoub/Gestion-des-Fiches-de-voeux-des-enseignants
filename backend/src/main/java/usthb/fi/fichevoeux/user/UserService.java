@@ -27,7 +27,18 @@ public class UserService {
         }
         return new UserDto(user);
     }
-
+    private String generateEmail(String name) {
+        // Implement email generation logic here
+        String generatedEmail = name.toLowerCase() + "@etu.usthb.dz"; // Example logic
+        
+        return generatedEmail; // Placeholder
+    }
+    private String generatePassword(String name) {
+        // Implement password generation logic here
+        String generatedPassword = name.toLowerCase() + "123"; // Example logic
+        
+        return generatedPassword; // Placeholder
+    }
     private void updateEntityFromDto(User existingUser, UserDto dto) {
         existingUser.setEmail(dto.getEmail());
         existingUser.setName(dto.getName());
@@ -59,9 +70,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto addUser(String email, String rawPassword, String name, Role role) {
+    public UserDto addUser( String name, Role role) {
+        String email = generateEmail(name);
+        String rawPassword = generatePassword(name);
         logger.info("Request to add new User with email: {}", email);
-
         if (userRepository.existsByEmail(email)) {
             logger.warn("Attempted to add user with existing email: {}", email);
             throw new RuntimeException("Email already exists: " + email);

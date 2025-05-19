@@ -40,7 +40,16 @@ public class UserController {
         UserDto userDto = userService.getUserByEmail(email);
         return ResponseEntity.ok(userDto);
     }
-
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto user) {
+        UserDto createdUser = userService.addUser(user.getName(), user.getRole());
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdUser.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(createdUser);
+    }
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable long id) {

@@ -1,0 +1,113 @@
+.main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    height: 100vh;
+    background-color: #fff;
+    flex-direction: column;
+    width: 100%;
+    margin: auto;
+    color: #000;
+}
+.section{
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 10px;
+}
+.section label{
+    text-align: left;
+    margin-bottom: 5px;
+}
+.section label::after{
+    content: "*";
+    color: red;
+    margin-left: 5px;
+}
+.grade-radio {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-direction: column;
+  align-items: center;
+}
+.grade-radio label::after{
+    content: "";
+}
+.section input{
+    background-color: #fff;
+    border-radius: 5px;
+    border: none;
+    padding: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    
+}
+.section .grade-radio label input {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+}
+.section .grade-radio label input[type="radio"] {
+    appearance: none;
+    --webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px #ccc;
+    margin-left: 0;
+}
+.section .grade-radio label input["radio"]{
+    margin-left: 0;
+    transition: all 0.3s ease;
+}
+.section .grade-radio label input[type="radio"]:checked::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #007bff;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+.section .grade-radio label input[type="radio"]:checked {
+    box-shadow: 0 0 0 2px #007bff;
+    background-color: #00a2ff;
+}
+.section .grade-radio label input[type="radio"]:checked + span {
+    color: #007bff;
+}
+.section .grade-radio label:hover {
+    color: #007bff;
+}
+.section .grade-radio label input[type="radio"]:hover {
+    box-shadow: 0 0 0 2px #007bff;
+    background-color: #00b3ff;
+}
+.section .extra-radio label::after {
+    content: "";
+}
+.section input::placeholder{
+    color: #999;
+}
+.section table tbody tr{
+    border-top: 1px solid #ccc;
+}
