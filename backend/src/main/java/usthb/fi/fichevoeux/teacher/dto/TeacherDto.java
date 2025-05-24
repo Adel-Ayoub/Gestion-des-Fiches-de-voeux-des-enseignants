@@ -15,6 +15,7 @@ public class TeacherDto {
     private String grade;
     private String officeNumber;
     private String departmentName;
+    private String personelEmail;
 
     public TeacherDto(Teacher teacher) {
         this.id = teacher.getId();
@@ -22,5 +23,6 @@ public class TeacherDto {
         this.grade = teacher.getGrade();
         this.officeNumber = teacher.getOfficeNumber();
         this.departmentName = teacher.getDepartmentName();
+        this.personelEmail = teacher.getPersonelEmail();
     }
 }

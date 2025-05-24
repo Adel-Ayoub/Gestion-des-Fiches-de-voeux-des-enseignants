@@ -7,155 +7,133 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTeacherById, getWishesByTeacherId } from '@/lib/data';
-import { WishItem } from '../wishes/WishesList';
+import {useState} from 'react';
+import {useLocation} from 'react-router-dom';
+import { useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode';
+import axios from 'axios';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+import { FileText, User } from 'lucide-react';
 
-export const TeacherDetail = () => {
-  const { id } = useParams();
-  const teacherId = parseInt(id || '0');
-  
-  const teacher = getTeacherById(teacherId);
-  const wishes = getWishesByTeacherId(teacherId);
-  
-  if (!teacher) {
-    return (
-      <div className="p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2">Teacher not found</h2>
-        <Link to="/teachers">
-          <Button>Back to Teachers</Button>
-        </Link>
-      </div>
-    );
+interface Teacher {
+  id?: number;
+  userId: number;
+  name?: string;
+  grade: string;
+  departmentName: string;
+  officeNumber: string;
+  email?: string;
+  emailPersonel?:string;
+  role?: string;
+  grade?: string;
   }
-  
-  // Check if teacher has submitted wishes
-  const hasSubmittedWishes = wishes.length > 0;
-  
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Link to="/teachers">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <h2 className="text-2xl font-bold">Teacher Profile</h2>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={teacher.avatar} alt={teacher.name} />
-                <AvatarFallback className="text-2xl">{teacher.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-              </Avatar>
-            </div>
-            <CardTitle>{teacher.name}</CardTitle>
-            <CardDescription>{teacher.email}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-gray-500" />
-                <span>{teacher.email}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-gray-500" />
-                <span>Joined {new Date(teacher.joinDate).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                {hasSubmittedWishes ? (
-                  <>
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-green-600">Wishes submitted</span>
-                  </>
-                ) : (
-                  <>
-                    <X className="w-5 h-5 text-red-500" />
-                    <span className="text-red-600">No wishes submitted</span>
-                  </>
-                )}
-              </div>
-              
-              <div className="pt-4 flex justify-between">
-                <Button variant="outline" className="flex items-center gap-1">
-                  <Edit className="w-4 h-4" />
-                  <span>Edit</span>
-                </Button>
-                <Button variant="destructive" className="flex items-center gap-1">
-                  <Trash2 className="w-4 h-4" />
-                  <span>Delete</span>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div className="lg:col-span-2">
-          <Tabs defaultValue="wishes">
-            <TabsList className="mb-4">
-              <TabsTrigger value="wishes">Wishes ({wishes.length})</TabsTrigger>
-              <TabsTrigger value="stats">Statistics</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
-            </TabsList>
+
+const TeacherDetail = () => {
+  const { id } = useParams();
+  const [user, setUser] = useState<Teacher>(null);
+   const [loading, setLoading] = useState(true);
+   useEffect(() => {
+    try{
+      const token= localStorage.getItem('jwt');
+      const {exp} =jwtDecode< {exp: number}>(token);
+      const currentTime = Date.now() / 1000;
+      if (!token || exp < currentTime) {
+        navigate('/login');
+        return;
+      }}catch (error) {
+      console.error("Error decoding token:", error);
+    }
+
+    const fetchTeachers = async () => {
+    try{
+      const token= localStorage.getItem('jwt');
+      const response= await axios.get<Teacher>('http://localhost:8080/api/teachers/'+id,{ headers:{Authorization: token}});
+      if (response.status ==401){
+          navigate('/login');
+      };
+      console.log(response.data);
+      const userres=await axios.get('http://localhost:8080/api/users/'+response.data.userId,{headers:{Authorization: token}});
+      console.log("after get user request");
+      setUser({...response.data, email: userres.data.email,name:userres.data.name,role:userres.data.role, emailPersonel:userres.data.emailPersonel});
+      console.log(user);
+    }catch (error) {
+      console.log("error fetching for teachers");
+      console.error(error);
+    }
+    };
+    fetchTeachers();
+    console.log(user);
+    setLoading(false);
+},[]);
+// Check if teacher has submitted wishes
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    const res= await axios.put("http://localhost:8080/api/users/"+user.id,  { "id":user.id,"email":user.email,"name":user.name, role:"TEACHER" },{ headers :{ Authorization: localStorage.getItem("jwt")} });
+    const response = await axios.put("http://localhost:8080/api/teachers/"+user.id, {"grade":user.grade,"officeNumber":user.officeNumber,"departmentName":user.departmentName}, { headers:{ Authorization: localStorage.getItem("jwt")} });
+    console.log(res.data);
+    
+};
+
+  return (<>
+    {loading ? (<div>Loading...</div>) : (
+    <div className="container mx-auto p-6">
+        <Tabs defaultValue="profile" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Informations
+            </TabsTrigger>
+            <TabsTrigger value="forms" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Messages
+            </TabsTrigger>
             
-            <TabsContent value="wishes" className="space-y-4">
-              {wishes.length > 0 ? (
-                <div className="space-y-3">
-                  {wishes.map((wish) => (
-                    <WishItem key={wish.id} wish={wish} showTeacher={false} />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="py-8 text-center">
-                    <p className="text-gray-500 mb-4">No wishes found for this teacher</p>
-                    <Button>Add New Wish</Button>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="stats">
-              <Card>
-                <CardContent className="py-6">
+          </TabsList>
+
+          <TabsContent value="profile">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations du Profil</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form  className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="stats-card">
-                      <h3 className="text-sm font-medium text-gray-500">Total Wishes</h3>
-                      <p className="text-3xl font-bold">{teacher.wishesCount}</p>
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Nom Complet</Label>
+                      <Input id="name" value={user?.name} onChange={(e) => setUser({ ...user, name: e.target.value })} />
                     </div>
-                    <div className="stats-card">
-                      <h3 className="text-sm font-medium text-gray-500">Completed</h3>
-                      <p className="text-3xl font-bold">{teacher.completedWishesCount}</p>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" value={user?.email} onChange={(e) => setUser({ ...user, email: e.target.value })} />
                     </div>
-                    <div className="stats-card col-span-2">
-                      <h3 className="text-sm font-medium text-gray-500">Completion Rate</h3>
-                      <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full" 
-                          style={{ width: `${(teacher.completedWishesCount / teacher.wishesCount) * 100}%` }}
-                        ></div>
-                      </div>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {Math.round((teacher.completedWishesCount / teacher.wishesCount) * 100)}% complete
-                      </p>
+                    <div className="space-y-2">
+                      <Label htmlFor="grade">Grade</Label>
+                      <Input id="grade" value={user?.grade} onChange={(e) => setUser({ ...user, grade: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="department">Département</Label>
+                      <Input id="department" value={user?.departmentName} onChange={(e) => setUser({ ...user, department: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="officeNumber">Bureau</Label>
+                      <Input id="officeNumber" value={user?.officeNumber} onChange={(e) => setUser({ ...user, officeNumber: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Role</Label>
+                      <Input id="role" value={user?.role} onChange={(e) => setUser({ ...user, role: e.target.value })} />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="notes">
-              <Card>
-                <CardContent className="py-6">
-                  <p className="text-gray-500 italic">No notes added yet.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </div>
+                  
+                  <Button onClick={handleProfileUpdate} className="space-y-3">Mettre à jour le profil</Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+    </div>)};
+  </>
   );
 };
+export default TeacherDetail;

@@ -14,6 +14,8 @@ import { DashboardLayout } from "./components/layout/Dashboard";
 import Form from '@/components/Form';
 import ProfilePage from '@/pages/Profile';
 import Login from "./pages/Login";
+import TeacherDetail from "./components/teachers/TeacherDetail";
+import {WishDetail} from "./components/wishes/WishDetail";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -28,9 +30,11 @@ const App = () => (
           {/* Dashboard Layout Routes */}
           <Route path="/admin" element={<DashboardLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="teachers/*" element={<Teachers />} />
-            <Route path="wishes/*" element={<Wishes />} />
-            <Route path="courses/*" element={<Courses />} />
+            <Route path="teachers" element={<Teachers />} />
+            <Route path="teachers/:id" element={<TeacherDetail />} />
+            <Route path="wishes" element={<Wishes />} />
+            <Route path="wishes/:id" element={<WishDetail />} />
+            <Route path="courses" element={<Courses />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/form" element={<Form />}/>

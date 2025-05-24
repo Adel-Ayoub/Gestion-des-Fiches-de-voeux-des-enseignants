@@ -32,8 +32,11 @@ public class FicheDeVoeuxService {
                 fiche.getAcademicYear(),
                 fiche.getWantsSupplementaryHoursS1(),
                 fiche.getWantsSupplementaryHoursS2(),
-                fiche.getProposedPfe(),
-                fiche.getComments());
+                fiche.getProposedPfeL(),
+                fiche.getProposedPfeM(),
+                fiche.getComments(),
+                fiche.getCreatedAt()
+        );
     }
 
     private FicheDeVoeux mapToEntity(FicheDeVoeuxDto dto) {
@@ -45,8 +48,10 @@ public class FicheDeVoeuxService {
         fiche.setAcademicYear(dto.getAcademicYear());
         fiche.setWantsSupplementaryHoursS1(dto.getWantsSupplementaryHoursS1());
         fiche.setWantsSupplementaryHoursS2(dto.getWantsSupplementaryHoursS2());
-        fiche.setProposedPfe(dto.getProposedPfe());
+        fiche.setProposedPfeL(dto.getProposedPfeL());
+        fiche.setProposedPfeM(dto.getProposedPfeM());
         fiche.setComments(dto.getComments());
+        fiche.setCreatedAt(dto.getCreatedAt());
         return fiche;
     }
 
@@ -54,8 +59,10 @@ public class FicheDeVoeuxService {
         existingFiche.setAcademicYear(dto.getAcademicYear());
         existingFiche.setWantsSupplementaryHoursS1(dto.getWantsSupplementaryHoursS1());
         existingFiche.setWantsSupplementaryHoursS2(dto.getWantsSupplementaryHoursS2());
-        existingFiche.setProposedPfe(dto.getProposedPfe());
+        existingFiche.setProposedPfeL(dto.getProposedPfeL());
+        existingFiche.setProposedPfeM(dto.getProposedPfeM());
         existingFiche.setComments(dto.getComments());
+        existingFiche.setCreatedAt(dto.getCreatedAt());
     }
 
     @Transactional(readOnly = true)

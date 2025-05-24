@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, Plus, ChevronRight, BookOpen, Clock, Layout, ListOrdered, User, Briefcase } from 'lucide-react';
+import { Search, Filter, Plus, ChevronRight, BookOpen, Clock, Layout, ListOrdered, User, Briefcase,Trash2,Share,Eye,Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,13 +14,64 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Wish, wishes, teachers, getTeacherById, courses, classes, getClassById } from '@/lib/data';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Wish,wishes, teachers, getTeacherById, courses, classes, getClassById } from '@/lib/data';
+import { useEffect } from 'react';
+import axios from 'axios';
+import ExportDataComponent from '@/components/ExportDataComponent';
+type teacher = {
+  id?:number;
+  userId:number;
+  name?:string;
+  grade:string;
+  officeNumber:string;
+  departmentName:string;
+  email?:string;
+  role?:string;
+}
+interface fichedeveoux{
+    id: number;
+    teacherId: number;
+    academicYear: string;
+    wantsSuplementaryHoursS1: number;
+    wantsSuplementaryHoursS2: number;
+    proposedPfeL: number;
+    proposedPfeM: number;
+    comments: string;
+    semester1Choices?: [fichechoice,fichechoice,fichechoice];
+    semester2Choices?: [fichechoice,fichechoice,fichechoice];
+    createdAt: string;
+}
 
-export const WishItem = ({ wish, showTeacher = true }: { wish: Wish, showTeacher?: boolean }) => {
-  const teacher = getTeacherById(wish.teacherId);
-  
+export const WishItem = ({ wish, showTeacher = true }: { wish: fichedeveoux, showTeacher?: boolean }) => {
+  const [teacher, setTeacher] = useState<teacher | null>(null);
+  const [exportDataDialogOpen, setExportDataDialogOpen] = useState(false);
+    useEffect(() => {
+      const fetchteacher = async () => {
+        const token = localStorage.getItem('jwt');
+        const res = await fetch(`http://localhost:8080/api/teachers/${wish.teacherId}`, {
+          headers: {
+            'Authorization': token,
+          }
+        });
+        const data = await res.json();
+        const response= await axios.get(`http://localhost:8080/api/users/${data.userId}`, {
+          headers: {
+            'Authorization': token,
+          }
+        });
+                setTeacher({...data, ...response.data});
+      }
+      fetchteacher();
+      
+    }, [wish.teacherId]);
+    console.log(teacher);
   // Get preferred courses names
-  const preferredCourses = wish.preferredCourses.map(courseId => {
+  /*const preferredCourses = wish.preferredCourses.map(courseId => {
     const course = courses.find(c => c.id === courseId);
     return course ? course.name : 'Unknown Course';
   });
@@ -29,113 +80,101 @@ export const WishItem = ({ wish, showTeacher = true }: { wish: Wish, showTeacher
   const preferredClasses = wish.preferredClasses.map(classId => {
     const cls = classes.find(c => c.id === classId);
     return cls ? cls.name : 'Unknown Class';
-  });
+  });*/
+  // Get preferred classes names
   
+  console.log(exportDataDialogOpen)
+const viewFiche = () => {
+      navigate(`/fiche/${wish.id}`);
+}
+const exportFiche = async (format: 'pdf' |'excel',filename:string) => {
+       console.log("export fiche");
+        try{
+        console.log(format);
+        const response = await axios.get("http://localhost:8080/api/admin/export/fiche/"+wish.id+"?format="+format, { headers: { 'Authorization': localStorage.getItem('jwt') },responseType: 'blob' }).catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+        const blob = new Blob([response.data], { type: format ==='pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const disposition = response.headers.get('Content-Disposition');
+        a.download = filename;
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        }catch (error) {
+          console.error("Error exporting fiche:", error);
+        }
+  }
+
+const deleteFiche = () => {
+       console.log("delete fiche");
+  }
   return (
-    <Card className="hover-scale">
+ <Card className="hover:shadow-md transition duration-300 ease-in-out">
       <CardContent className="p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Teacher Information - Replace title and tags */}
-          <div className="flex items-start gap-3 md:w-1/4">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={teacher?.avatar} alt={teacher?.name} />
-              <AvatarFallback>{teacher?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-            </Avatar>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-2">
+          <ExportDataComponent isOpen={exportDataDialogOpen} onClose={() => setExportDataDialogOpen(false)} onExport={exportFiche} />
+          </div>
+          {/* Left: Teacher Info */}
+          <div className="flex items-start gap-3">
             <div>
-              <h3 className="font-medium">{teacher?.name}</h3>
+              <h3 className="font-medium text-lg">{teacher?.name}</h3>
               <div className="flex items-center text-sm text-gray-500">
-                <Briefcase className="w-3 h-3 mr-1" /> 
-                <span>{teacher?.department}</span>
+                <Briefcase className="w-4 h-4 mr-1" /> 
+                {teacher?.departmentName}
               </div>
               <div className="flex items-center text-sm text-gray-500">
-                <User className="w-3 h-3 mr-1" /> 
-                <span>{teacher?.subject}</span>
+                <User className="w-4 h-4 mr-1" /> 
+                {teacher?.email}
               </div>
             </div>
           </div>
-          
-          {/* Courses Section - Middle */}
-          <div className="md:w-1/3">
-            <div className="flex items-center gap-1 mb-2">
-              <ListOrdered className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium">Preferred Courses:</span>
-            </div>
-            <div className="space-y-1">
-              {preferredCourses.slice(0, 3).map((course, index) => (
-                <div key={index} className="flex items-center gap-1">
-                  <span className="text-xs font-medium bg-gray-100 rounded-full w-4 h-4 flex items-center justify-center">
-                    {index + 1}
-                  </span>
-                  <span className="text-sm truncate">{course}</span>
-                </div>
-              ))}
-            </div>
+
+          {/* Middle: Comments and CreatedAt */}
+          <div className="flex-1">
+            <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Comment:</span> {wish.comments}</p>
+            <p className="text-xs text-gray-500"><span className="font-semibold">Created:</span> {new Date(wish.createdAt).toLocaleDateString()}</p>
           </div>
           
-          {/* Classes Section */}
-          <div className="md:w-1/4">
-            <div className="flex items-center gap-1 mb-2">
-              <Layout className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium">Preferred Classes:</span>
-            </div>
-            <div className="space-y-1">
-              {preferredClasses.slice(0, 3).map((cls, index) => (
-                <div key={index} className="flex items-center gap-1">
-                  <span className="text-xs font-medium bg-gray-100 rounded-full w-4 h-4 flex items-center justify-center">
-                    {index + 1}
-                  </span>
-                  <span className="text-sm truncate">{cls}</span>
-                </div>
-              ))}
-            </div>
+          {/* Middle: grade*/}
+          <div className="flex items-center gap-2 mr-8 max-h-[80vg] overflow-y-auto ">
+            <Badge className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+              {teacher?.grade}
+            </Badge>
           </div>
-          
-          {/* Hours Section - Right Side */}
-          <div className="md:w-1/6 flex flex-row md:flex-col justify-between md:items-end">
-            <div>
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4 text-gray-500" />
-                <div className="text-sm font-medium">{wish.teachingHours.total} hours</div>
-              </div>
-              <div className="text-xs space-y-1 text-gray-600">
-                <div>Lectures: {wish.teachingHours.lecture}h</div>
-                <div>TD: {wish.teachingHours.tutorial}h</div>
-                <div>TP: {wish.teachingHours.practical}h</div>
-                {wish.teachingHours.additional > 0 && (
-                  <div className="text-primary">+{wish.teachingHours.additional}h additional</div>
-                )}
-              </div>
-            </div>
-            <Link to={`/wishes/${wish.id}`}>
-              <Button variant="ghost" size="icon">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
+
+          {/* Right: Action Buttons */}
+          <div className="flex gap-2 ml-auto">
+            <Eye
+              title="view fiche"
+              className="w-8 h-8 cursor-pointer border rounded-md p-1 bg-gray-100 hover:bg-blue-100 text-blue-600 transition"
+              onClick={viewFiche}
+            />
+            <Download
+              title="export fiche"
+              className="w-8 h-8 cursor-pointer border rounded-md p-1 bg-gray-100 hover:bg-gray-200 text-black transition"
+              onClick={() => setExportDataDialogOpen(true)}
+            />
+            <Trash2
+              title="delete fiche"
+              className="w-8 h-8 cursor-pointer border rounded-md p-1 bg-gray-100 hover:bg-red-100 text-red-500 transition"
+              onClick={deleteFiche}
+            />
           </div>
         </div>
       </CardContent>
     </Card>
+
   );
 };
 
-export const WishesList = () => {
+export const WishesList = ({wishes}:{fichedeveoux}) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  
-  const filteredWishes = wishes.filter(wish => {
-    const matchesSearch = 
-      wish.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      wish.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || wish.status === statusFilter;
-    const matchesCategory = categoryFilter === 'all' || wish.category === categoryFilter;
-    
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
-  
-  const categories = [...new Set(wishes.map(wish => wish.category))];
-  
+    const [categoryFilter, setCategoryFilter] = useState('all');
+  const filteredWishes = wishes;  
   return (
     <div className="space-y-4">
       <div className="flex justify-between flex-col md:flex-row gap-4">
@@ -150,27 +189,9 @@ export const WishesList = () => {
         </div>
         
         <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-1">
-                <Filter className="w-4 h-4" />
-                <span>Status</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setStatusFilter('all')}>
-                All Status
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter('pending')}>Pending</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter('approved')}>Approved</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter('completed')}>Completed</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter('declined')}>Declined</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
           
-          <DropdownMenu>
+          
+{/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-1">
                 <Filter className="w-4 h-4" />
@@ -188,17 +209,13 @@ export const WishesList = () => {
                   {category}
                 </DropdownMenuItem>
               ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <Button className="flex items-center gap-1">
-            <Plus className="w-4 h-4" />
-            <span>Add Wish</span>
-          </Button>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 gap-4">
+</DropdownMenuContent>
+</DropdownMenu>*/}
+
+</div>
+</div>
+
+            <div className="grid grid-cols-1 gap-4">
         {filteredWishes.length > 0 ? (
           filteredWishes.map((wish) => (
             <WishItem key={wish.id} wish={wish} />
@@ -208,7 +225,7 @@ export const WishesList = () => {
             <p className="text-gray-500 mb-2">No wishes found matching your filters</p>
             <Button onClick={() => {
               setSearchTerm('');
-              setStatusFilter('all');
+              
               setCategoryFilter('all');
             }}>Clear Filters</Button>
           </div>

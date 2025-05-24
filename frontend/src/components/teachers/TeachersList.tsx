@@ -38,8 +38,9 @@ interface Teacher {
   grade: string;
   officeNumber: string;
   departmentName: string;
-  officeNumber: string;
   email?: string;
+  emailPersonel?: string;
+  role?: string;
   }
 interface User {
   id: number;
@@ -57,11 +58,11 @@ export const TeachersList = () => {
   const [teachersList, setTeachersList] = useState<Teacher[]>([]);
   const [currentTeacher, setCurrentTeacher] = useState<Teacher | null>(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     try{
       const token= localStorage.getItem('jwt');
       const {exp} =jwtDecode< {exp: number}>(token);
-      console.log("exp",exp);
       const currentTime = Date.now() / 1000;
       if (!token || exp < currentTime) {
         navigate('/login');
@@ -88,6 +89,7 @@ export const TeachersList = () => {
     }
     };
     fetchTeachers();
+    setLoading(false);
 },[]);
     
   // Form state
@@ -229,10 +231,12 @@ const addedteacher :Teacher = {id:res.data.id,...newTeacher}  as Teacher;
   };
   
   return (
+    <>
+      {loading ? (<div>Loading...</div>) : (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex-1 w-full md:w-auto">
-          <div className="relative">
+          <div className="relativei">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <Input 
               placeholder="Search teachers..." 
@@ -333,11 +337,10 @@ const addedteacher :Teacher = {id:res.data.id,...newTeacher}  as Teacher;
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                      <Link to={`/teachers/${teacher.id}`}>
-                        <Button variant="outline" size="icon">
+                      <Button variant="outline" size="icon" onClick={() => navigate(`/admin/teachers/${teacher.id}`)}>
                           <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </Link>
+                       </Button>
+                      
                     </div>
                   </TableCell>
                 </TableRow>
@@ -529,6 +532,6 @@ const addedteacher :Teacher = {id:res.data.id,...newTeacher}  as Teacher;
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </div>)};</>
   );
 };

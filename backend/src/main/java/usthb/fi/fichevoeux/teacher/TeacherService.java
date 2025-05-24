@@ -28,7 +28,8 @@ public class TeacherService {
                 teacher.getUserId(),
                 teacher.getGrade(),
                 teacher.getOfficeNumber(),
-                teacher.getDepartmentName()
+                teacher.getDepartmentName(),
+                teacher.getPersonelEmail()
         );
     }
 
@@ -41,6 +42,7 @@ public class TeacherService {
         teacher.setGrade(dto.getGrade());
         teacher.setOfficeNumber(dto.getOfficeNumber());
         teacher.setDepartmentName(dto.getDepartmentName());
+        teacher.setPersonelEmail(dto.getPersonelEmail());
         return teacher;
     }
 
@@ -48,6 +50,7 @@ public class TeacherService {
         existingTeacher.setGrade(dto.getGrade());
         existingTeacher.setOfficeNumber(dto.getOfficeNumber());
         existingTeacher.setDepartmentName(dto.getDepartmentName());
+        existingTeacher.setPersonelEmail(dto.getPersonelEmail());
     }
 
     @Transactional(readOnly = true)

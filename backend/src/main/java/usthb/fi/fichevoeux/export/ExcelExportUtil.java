@@ -63,7 +63,8 @@ public class ExcelExportUtil {
             addKeyValueRow(sheet, rowIndex++, "Enseignant:", teacherInfo, boldLabelStyle, dataCellStyle);
             addKeyValueRow(sheet, rowIndex++, "H. Supp S1:", Optional.ofNullable(yearlyFiche.getWantsSupplementaryHoursS1()).map(Object::toString).orElse("0"), boldLabelStyle, centerDataStyle);
             addKeyValueRow(sheet, rowIndex++, "H. Supp S2:", Optional.ofNullable(yearlyFiche.getWantsSupplementaryHoursS2()).map(Object::toString).orElse("0"), boldLabelStyle, centerDataStyle);
-            addKeyValueRow(sheet, rowIndex++, "PFE Proposés:", Optional.ofNullable(yearlyFiche.getProposedPfe()).map(Object::toString).orElse("0"), boldLabelStyle, centerDataStyle);
+            addKeyValueRow(sheet, rowIndex++, "PFE Licence Proposés:", Optional.ofNullable(yearlyFiche.getProposedPfeL()).map(Object::toString).orElse("0"), boldLabelStyle, centerDataStyle);
+            addKeyValueRow(sheet, rowIndex++, "PFE Master Proposés:", Optional.ofNullable(yearlyFiche.getProposedPfeM()).map(Object::toString).orElse("0"), boldLabelStyle, centerDataStyle);
 
             Row commentRow = sheet.createRow(rowIndex++);
             Cell commentLabelCell = commentRow.createCell(0); commentLabelCell.setCellValue("Commentaires:"); commentLabelCell.setCellStyle(boldLabelStyle);

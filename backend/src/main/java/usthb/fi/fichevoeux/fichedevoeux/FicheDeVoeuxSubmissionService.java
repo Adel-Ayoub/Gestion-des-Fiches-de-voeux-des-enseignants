@@ -12,11 +12,12 @@ import usthb.fi.fichevoeux.fichedevoeux.dto.FicheSubmissionRequestDto;
 import usthb.fi.fichevoeux.module.Module;
 import usthb.fi.fichevoeux.module.ModuleRepository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import java.time.temporal.ChronoUnit;
 @Service
 @RequiredArgsConstructor
 public class FicheDeVoeuxSubmissionService {
@@ -43,8 +44,10 @@ public class FicheDeVoeuxSubmissionService {
 
         yearlyFiche.setWantsSupplementaryHoursS1(requestDto.getWantsSupplementaryHoursS1());
         yearlyFiche.setWantsSupplementaryHoursS2(requestDto.getWantsSupplementaryHoursS2());
-        yearlyFiche.setProposedPfe(requestDto.getProposedPfe());
+        yearlyFiche.setProposedPfeL(requestDto.getProposedPfeL());
+        yearlyFiche.setProposedPfeM(requestDto.getProposedPfeM());
         yearlyFiche.setComments(requestDto.getComments());
+        yearlyFiche.setCreatedAt(Instant.now().truncatedTo(ChronoUnit.SECONDS));
 
         FicheDeVoeux savedYearlyFiche = ficheDeVoeuxRepository.save(yearlyFiche);
         logger.info("Saved/Updated yearly FicheDeVoeux with ID: {}", savedYearlyFiche.getId());

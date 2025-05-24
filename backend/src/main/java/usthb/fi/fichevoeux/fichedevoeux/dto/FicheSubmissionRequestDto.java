@@ -20,7 +20,8 @@ public class FicheSubmissionRequestDto {
 
     private Integer wantsSupplementaryHoursS1;
     private Integer wantsSupplementaryHoursS2;
-    private Integer proposedPfe;
+    private Integer proposedPfeL;
+    private Integer proposedPfeM;
     private String comments;
 
     @NotNull(message = "Semester 1 choices must be provided.")

@@ -4,9 +4,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {ChatContainer} from "@/components/messaging/ChatContainer";
 import { Textarea } from "@/components/ui/textarea";
 import { Header } from '@/components/layout/Header';
 import { Badge } from "@/components/ui/badge";
+import Mailbox from '@/components/Mailbox';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   User, 
@@ -19,20 +21,29 @@ import {
   Calendar,
   Clock
 } from "lucide-react";
+import { useEffect } from "react";
+import axios from "axios";
+import {jwtDecode} from 'jwt-decode';
+import ChatComponent from "@/components/Chat";
+type teacher = {
+  id?:number;
+  userId:number;
+  name?:string;
+  grade:string;
+  officeNumber:string;
+  departmentName:string;
+  email?:string;
+  role?:string;
+}
 
+  
 function ProfilePage() {
-  const [user, setUser] = useState({
-    fullName: "John Doe",
-    email: "johndoe@example.com",
-    rank: "Enseignant Senior",
-    department: "Informatique",
-    officeNumber: "CS-101",
-    phone: "+1234567890"
-  });
+  const [user, setUser] = useState<teacher>(""); 
 
   const [message, setMessage] = useState("");
 
   const previousForms = [
+
     {
       id: 1,
       submitDate: "2024-03-01",
@@ -55,47 +66,47 @@ function ProfilePage() {
       totalHours: 14
     }
   ];
+  useEffect(() => {
+    // Simulate fetching user data from an API
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("jwt");
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken);
+      const userdto = await axios.get("http://localhost:8080/api/users/by-email" ,{headers: { Authorization: token}, params: { email: decodedToken.sub }});
+      console.log(userdto.data);
+      const response = await axios.get("http://localhost:8080/api/teachers/user/"+parseInt(userdto.data.id), {headers: { Authorization: token}});
+      console.log(response.data);
 
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "J'ai besoin de clarifications sur l'allocation des heures d'enseignement.",
-      timestamp: "2024-03-15 10:30",
-      sender: "user"
-    },
-    {
-      id: 2,
-      text: "Votre demande a été reçue. Un administrateur vous répondra bientôt.",
-      timestamp: "2024-03-15 10:35",
-      sender: "admin"
-    }
-  ]);
+      setUser({
+        id: userdto.id,
+        userId: response.data.id,
+        
+        name: userdto.data.name,
+        email: userdto.data.email,
+        rank: response.data.grade,
+        department: response.data.departmentName,
+        officeNumber: response.data.officeNumber,
+        role:userdto.data.role,      });    
+};
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+    fetchUserData();
+  }, []);
+
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    alert("Profil mis à jour avec succès !");
-  };
+    const res= await axios.put("http://localhost:8080/api/users/"+user.id,  { "id":user.id,"email":user.email,"name":user.name, role:"TEACHER" },{ headers :{ Authorization: localStorage.getItem("jwt")} });
+    const response = await axios.put("http://localhost:8080/api/teachers/"+user.id, {"grade":user.rank,"officeNumber":user.officeNumber,"departmentName":user.departmentName}, { headers:{ Authorization: localStorage.getItem("jwt")} });
+    console.log(res.data);
+    
+};
+
 
   const handleSettingsUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     alert("Paramètres enregistrés avec succès !");
   };
 
-  const handleMessageSend = () => {
-    if (message.trim()) {
-      setMessages([
-        ...messages,
-        {
-          id: messages.length + 1,
-          text: message,
-          timestamp: new Date().toLocaleString(),
-          sender: "user"
-        }
-      ]);
-      setMessage("");
-    }
-  };
-
+  
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "approuvé": return "bg-green-100 text-green-800";
@@ -135,11 +146,11 @@ function ProfilePage() {
                 <CardTitle>Informations du Profil</CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <form  className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="fullName">Nom Complet</Label>
-                      <Input id="fullName" value={user.fullName} onChange={(e) => setUser({ ...user, fullName: e.target.value })} />
+                      <Input id="name" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
@@ -158,11 +169,12 @@ function ProfilePage() {
                       <Input id="officeNumber" value={user.officeNumber} onChange={(e) => setUser({ ...user, officeNumber: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Téléphone</Label>
-                      <Input id="phone" value={user.phone} onChange={(e) => setUser({ ...user, phone: e.target.value })} />
+                      <Label htmlFor="role">Role</Label>
+                      <Input id="role" value={user.role} onChange={(e) => setUser({ ...user, role: e.target.value })} />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full">Mettre à jour le profil</Button>
+                  
+                  <Button onClick={handleProfileUpdate} className="space-y-3">Mettre à jour le profil</Button>
                 </form>
               </CardContent>
             </Card>
@@ -248,31 +260,7 @@ function ProfilePage() {
                 <CardTitle>Chat de Support</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[400px] flex flex-col">
-                  <ScrollArea className="flex-1 pr-4 mb-4">
-                    <div className="space-y-4">
-                      {messages.map((msg) => (
-                        <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                          <div className={`max-w-[80%] rounded-lg p-3 ${msg.sender === "user" ? "bg-primary text-white" : "bg-gray-100"}`}>
-                            <p>{msg.text}</p>
-                            <p className="text-xs mt-1 opacity-70">{msg.timestamp}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  <div className="flex gap-2">
-                    <Textarea
-                      placeholder="Écrivez votre message..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button onClick={handleMessageSend} className="flex-shrink-0">
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+                <Mailbox userId={user.userId}/>
               </CardContent>
             </Card>
           </TabsContent>

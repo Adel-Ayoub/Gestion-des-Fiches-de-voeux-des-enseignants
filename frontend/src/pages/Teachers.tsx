@@ -2,7 +2,7 @@
 import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { TeachersList } from '@/components/teachers/TeachersList';
-import { TeacherDetail } from '@/components/teachers/TeacherDetail';
+import  TeacherDetail  from '@/components/teachers/TeacherDetail';
 import { Routes, Route } from 'react-router-dom';
 
 const Teachers = () => {
@@ -20,18 +20,7 @@ const Teachers = () => {
             </>
           } 
         />
-        <Route 
-          path=":id" 
-          element={
-            <>
-              <Header title="Teacher Details" />
-              <div className="p-6">
-                <TeacherDetail />
-              </div>
-            </>
-          } 
-        />
-      </Routes>
+              </Routes>
     </>
   );
 };

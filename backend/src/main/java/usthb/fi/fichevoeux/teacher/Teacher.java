@@ -28,4 +28,7 @@ public class Teacher {
 
     @Column(name = "DEPARTMENT_NAME")
     private String departmentName;
+
+    @Column(name = "PersonelEmail")
+    private String personelEmail;
 }

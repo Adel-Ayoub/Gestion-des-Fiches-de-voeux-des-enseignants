@@ -59,7 +59,8 @@ public class PdfExportUtil {
             addMetaRow(metaTable, "Enseignant:", teacherInfo);
             addMetaRow(metaTable, "Heures Supp S1:", Optional.ofNullable(yearlyFiche.getWantsSupplementaryHoursS1()).map(Object::toString).orElse("0"));
             addMetaRow(metaTable, "Heures Supp S2:", Optional.ofNullable(yearlyFiche.getWantsSupplementaryHoursS2()).map(Object::toString).orElse("0"));
-            addMetaRow(metaTable, "PFE Proposés:", Optional.ofNullable(yearlyFiche.getProposedPfe()).map(Object::toString).orElse("0"));
+            addMetaRow(metaTable, "PFE Licence Proposés:", Optional.ofNullable(yearlyFiche.getProposedPfeL()).map(Object::toString).orElse("0"));
+            addMetaRow(metaTable, "PFE Master Proposés:", Optional.ofNullable(yearlyFiche.getProposedPfeM()).map(Object::toString).orElse("0"));
             document.add(metaTable);
 
             document.add(new Paragraph("Commentaires:", FONT_LABEL));
