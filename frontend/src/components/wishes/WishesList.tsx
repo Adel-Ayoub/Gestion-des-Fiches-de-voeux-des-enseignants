@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Filter, Plus, ChevronRight, BookOpen, Clock, Layout, ListOrdered, User, Briefcase,Trash2,Share,Eye,Download } from 'lucide-react';
+import { Link , useNavigate } from 'react-router-dom';
+import { Search, Filter, Plus, ChevronRight, BookOpen, Clock, Layout, ListOrdered, User, Briefcase,Trash2,Share,Eye,Download,Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -19,9 +19,9 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Wish,wishes, teachers, getTeacherById, courses, classes, getClassById } from '@/lib/data';
 import { useEffect } from 'react';
 import axios from 'axios';
+import {jwtDecode} from 'jwt-decode';
 import ExportDataComponent from '@/components/ExportDataComponent';
 type teacher = {
   id?:number;
@@ -50,6 +50,21 @@ interface fichedeveoux{
 export const WishItem = ({ wish, showTeacher = true }: { wish: fichedeveoux, showTeacher?: boolean }) => {
   const [teacher, setTeacher] = useState<teacher | null>(null);
   const [exportDataDialogOpen, setExportDataDialogOpen] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
+  const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
+    useEffect(() => {
+      const token = localStorage.getItem('jwt');
+      if (token) {
+          try{
+              const decoded =jwtDecode(token) as any;
+              console.log("Decoded token:", decoded);
+              setIsTeacher(decoded.roles === 'ROLE_TEACHER');
+          }catch (error) {
+            console.error("Error decoding token:", error);
+          }
+      }
+  }, []);
     useEffect(() => {
       const fetchteacher = async () => {
         const token = localStorage.getItem('jwt');
@@ -87,6 +102,9 @@ export const WishItem = ({ wish, showTeacher = true }: { wish: fichedeveoux, sho
 const viewFiche = () => {
       navigate(`/fiche/${wish.id}`);
 }
+const editFiche = () => {
+    navigate(`/form?edit=true&ficheid=${wish.id}`);
+}
 const exportFiche = async (format: 'pdf' |'excel',filename:string) => {
        console.log("export fiche");
         try{
@@ -109,7 +127,10 @@ const exportFiche = async (format: 'pdf' |'excel',filename:string) => {
   }
 
 const deleteFiche = () => {
-       console.log("delete fiche");
+    const token = localStorage.getItem('jwt');
+    const response = axios.delete(`http://localhost:8080/api/fiches-de-voeux/${wish.id}`, { headers: { 'Authorization': token } }).catch((error) => {
+      console.error("Error deleting fiche:", error);
+    });
   }
   return (
  <Card className="hover:shadow-md transition duration-300 ease-in-out">
@@ -153,6 +174,12 @@ const deleteFiche = () => {
               className="w-8 h-8 cursor-pointer border rounded-md p-1 bg-gray-100 hover:bg-blue-100 text-blue-600 transition"
               onClick={viewFiche}
             />
+            {isTeacher && wish.academicYear==`${currentYear}/${currentYear+1}`&& (
+              <Edit
+                                  title="edit fiche"
+                  className="w-8 h-8 cursor-pointer border rounded-md p-1 bg-gray-100 hover:bg-yellow-100 text-yellow-600 transition"
+                  onClick={editFiche}/>
+                                          )}
             <Download
               title="export fiche"
               className="w-8 h-8 cursor-pointer border rounded-md p-1 bg-gray-100 hover:bg-gray-200 text-black transition"

@@ -7,7 +7,7 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import { useState,useEffect } from 'react';
 import { motion,AnimatePresence } from 'framer-motion';
 import {Header} from './layout/Header';
-
+import { useNavigate, useSearchParams } from 'react-router-dom';
 type course = {
     id: number;
     moduleName: string;
@@ -32,8 +32,8 @@ interface fichedeveoux{
     proposedPfeL: number;
     proposedPfeM: number;
     comments: string;
-    semester1Choices: [fichechoice,fichechoice,fichechoice];
-    semester2Choices: [fichechoice,fichechoice,fichechoice];
+    semester1Choices?: [fichechoice,fichechoice,fichechoice];
+    semester2Choices?: [fichechoice,fichechoice,fichechoice];
 }
 const schema= yup.object({
         extra_s1: yup.number().typeError("veuillez entrer un numéro").positive("numéro des heures doit ètre positive").integer("veuillez entrer un entier"),
@@ -44,11 +44,19 @@ const schema= yup.object({
     }).required();
 function Form() {
     const currentYear = new Date().getFullYear();
+const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const isEditMode = searchParams.get('edit') == 'true';
+    const ficheId = searchParams.get('ficheid');
+    console.log(ficheId);
+    console.log("isEditMode:", isEditMode);
      const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
+    setValue,
+    watch,
   } = useForm({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -56,7 +64,6 @@ function Form() {
         const [extra_s1, setSelected] = useState("");
     const [extra_s2, setSelected2] = useState("");
     const [valid, setIsValid] = useState("");
-    const [value, setValue] = useState("");
 
     const [courses, setCourses] = useState<course[]>([]);
     const [courseName, setCourseName] = useState("");
@@ -101,7 +108,70 @@ function Form() {
         };
         fetchCourses();
     },[]);
+useEffect(() => {
+    if (isEditMode && ficheId) {
+      const fetchFicheData = async () => {
+        try {
+          const token = localStorage.getItem("jwt");
+          const response = await axios.get(`http://localhost:8080/api/fiches-de-voeux/${ficheId}`, {
+            headers: { Authorization: token }
+          });
+          const ficheData = response.data as fichedeveoux;
+          console.log("Fetched fiche data:", ficheData);
+                  const res = await axios.get<fichedeveoux[]>(`http://localhost:8080/ficheChoice/by-fiche/${ficheId}`, {
+          headers: {
+            'Authorization':localStorage.getItem('jwt'),
+          }
+        });
+        const semester1Choices = [];
+        const semester2Choices= [];
+        console.log("Fetched choices data:", ficheData);
+        res.data.forEach((choice: fichechoice) => {
+          if (choice.targetSemester === 'S1') {
+            semester1Choices.push(choice);
+          } else if (choice.targetSemester === 'S2') {
+            semester2Choices.push(choice);}
+        });
+        ficheData.semester1Choices = semester1Choices;
+        ficheData.semester2Choices = semester2Choices;
+          console.log("Fetched choices:", ficheData.semester1Choices, ficheData.semester2Choices);
+          
+          // Set fetched choices to state
+          setSemester1choices(ficheData.semester1Choices || semester1choices);
+          setSemester2choices(ficheData.semester2Choices || semester2choices);
+          
+          // Log the fetched choices
+       console.log("Fetched choices:", res.data); 
 
+          // Populate form with existing data
+          setValue('extra_s1', ficheData.wantsSupplementaryHoursS1);
+          setValue('extra_s2', ficheData.wantsSupplementaryHoursS2);
+          setValue('proposedPfeL', ficheData.proposedPfeL);
+          setValue('proposedPfeM', ficheData.proposedPfeM);
+          setValue('comments', ficheData.comments);
+          
+          // Set radio buttons state
+          if (ficheData.wantsSupplementaryHoursS1 > 0) {
+            setSelected('extra_s1');
+          }
+          if (ficheData.wantsSupplementaryHoursS2 > 0) {
+            setSelected2('extra_s2');
+          }
+          
+          // Set choices
+          if (ficheData.semester1Choices) {
+            setSemester1choices(ficheData.semester1Choices);
+          }
+          if (ficheData.semester2Choices) {
+            setSemester2choices(ficheData.semester2Choices);
+          }
+        } catch (error) {
+          console.error("Error fetching fiche data:", error);
+        }
+      };
+      fetchFicheData();
+    }
+  }, [isEditMode, ficheId, setValue]);
         const filtercourses = () => {
         const key= `${level}-${specialty}-${semester}`;
         return selectedCourses.filter(c => c.moduleName === key);
@@ -167,6 +237,9 @@ function Form() {
     if (semester === 'S1') setSemester1choices((prev) => update(prev));
     else setSemester2choices((prev) => update(prev));
   };
+const handleCancel = () => {
+  navigate('/profile');
+}
 const handleFinalSubmit = () => {
   const academicYear = `${currentYear}/${currentYear + 1}`;
   const payload: fichedeveoux = {
@@ -355,11 +428,12 @@ const renderChoiceTable = (semester: 'S1' | 'S2', choices: fichechoice[], setFn:
 </div>*/}
 <div className="section">
           <label>Choix d'enseignements du Semestre 1</label>
-          {renderChoiceTable('S1', semester1choices, handleChoiceChange, coursesS1)}
+          {isEditMode ? renderChoiceTable('S1',semester1choices,handleChoiceChange,coursesS1):renderChoiceTable('S1', semester1choices, handleChoiceChange, coursesS1)}
         </div>
         <div className="section">
           <label>Choix d'enseignements du Semestre 2</label>
-          {renderChoiceTable('S2', semester2choices, handleChoiceChange, coursesS2)}
+
+          { isEditMode ? renderChoiceTable('S2',semester2choices,handleChoiceChange,coursesS2):renderChoiceTable('S2', semester2choices, handleChoiceChange, coursesS2)}
         </div>
             <div className="section">
                 <label htmlFor="extra">Voulez vous assurer des enseignements en heurs supp en S1?</label>
@@ -403,16 +477,20 @@ const renderChoiceTable = (semester: 'S1' | 'S2', choices: fichechoice[], setFn:
                 <label className="optional"> enter a comment</label>
                 <input {...register("comments")} type="text" name="comments" className="comments border p-1 rounded" placeholder="veuillez entrer votre commentaire" />
             </div>
-
+<div className="flex flex-row gap-6">{ isEditMode&& ( 
+    <button
+  type="button"
+  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+  onClick={handleCancel}
+>
+  Annuler
+</button>)}
 <button
   type="button"
   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-  onClick={handleFinalSubmit}
-
->
-  Envoyer
-</button>
-                  </form>
+  onClick={handleFinalSubmit}>
+{ isEditMode ? "Modifier" : "Envoyer"}</button></div>
+</form>
         </>
     );
     }
