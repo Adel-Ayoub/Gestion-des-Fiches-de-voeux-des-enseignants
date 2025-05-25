@@ -65,6 +65,7 @@ function Form() {
     const [semester, setSemester] = useState(1);
     const [hasTd,setHasTd]= useState(true);
     const [hasTp,setHasTp]=useState(true);
+    const [comments, setComments] = useState("");
     const [selectedCourses, setSelectedCourses] = useState<course[]>([]);
     const [semester1choices, setSemester1choices] = useState<fichechoice[]>([
     { moduleId: 0, rank: 1, wantsCours: false, wantsTd: 0, wantsTp: 0, targetSemester: 'S1' },
@@ -398,6 +399,11 @@ const renderChoiceTable = (semester: 'S1' | 'S2', choices: fichechoice[], setFn:
                 <label> Nombre de PFE Master prévus pour l'année {currentYear}/{currentYear+1}</label>
                 <input {...register("proposedPfeM")} type="text" name="proposedPfeM" className="pfe-master border p-1 rounded" placeholder="veuillez entrer un numéro" />
             </div>
+            <div className="section">
+                <label className="optional"> enter a comment</label>
+                <input {...register("comments")} type="text" name="comments" className="comments border p-1 rounded" placeholder="veuillez entrer votre commentaire" />
+            </div>
+
 <button
   type="button"
   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Header } from '@/components/layout/Header';
 import { Badge } from "@/components/ui/badge";
 import Mailbox from '@/components/Mailbox';
+import WishsList from '@/components/wishes/WishesList';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   User, 
@@ -66,6 +67,7 @@ function ProfilePage() {
       totalHours: 14
     }
   ];
+  const [wishes, setWishes] = useState([]);
   useEffect(() => {
     // Simulate fetching user data from an API
     const fetchUserData = async () => {
@@ -76,6 +78,9 @@ function ProfilePage() {
       console.log(userdto.data);
       const response = await axios.get("http://localhost:8080/api/teachers/user/"+parseInt(userdto.data.id), {headers: { Authorization: token}});
       console.log(response.data);
+      const res = await axios.get("http://localhost:8080/api/teachers/teacher/submitted-fiches/19", { headers: { Authorization: token } });
+      setWishes(res.data);
+      console.log(wishes);
 
       setUser({
         id: userdto.id,
@@ -88,11 +93,11 @@ function ProfilePage() {
         officeNumber: response.data.officeNumber,
         role:userdto.data.role,      });    
 };
-
+    
+    // fetch submitted forms from the API
     fetchUserData();
   }, []);
-
-  const handleProfileUpdate = async (e) => {
+    const handleProfileUpdate = async (e) => {
     e.preventDefault();
     const res= await axios.put("http://localhost:8080/api/users/"+user.id,  { "id":user.id,"email":user.email,"name":user.name, role:"TEACHER" },{ headers :{ Authorization: localStorage.getItem("jwt")} });
     const response = await axios.put("http://localhost:8080/api/teachers/"+user.id, {"grade":user.rank,"officeNumber":user.officeNumber,"departmentName":user.departmentName}, { headers:{ Authorization: localStorage.getItem("jwt")} });
@@ -186,27 +191,12 @@ function ProfilePage() {
                 <CardTitle>Soumissions Précédentes</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {previousForms.map((form) => (
-                    <div key={form.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                      <div className="space-y-1">
-                        <div className="font-medium">{form.semester}</div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {form.submitDate}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {form.totalHours} heures
-                          </span>
-                        </div>
-                      </div>
-                      <Badge className={getStatusColor(form.status)}>{form.status}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
+                { wishes.length > 0 ? (
+                  <WishesList wishes={wishes}/>                ) : (
+                  <p>Aucune soumission précédente trouvée.</p>
+                )}          
+
+</CardContent>
             </Card>
           </TabsContent>
 
