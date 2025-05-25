@@ -33,15 +33,17 @@ public class TeacherController {
 
 @GetMapping("/teacher/submitted-fiches/{id}")
 @PreAuthorize("hasRole('TEACHER')")
-public ResponseEntity<List<FicheDeVoeuxDto>> getTeacherSubmittedFiches(@PathVariable Long id,Authentication authentication) {
+public ResponseEntity<List<FicheDeVoeux>> getTeacherSubmittedFiches(@PathVariable Long id,Authentication authentication) {
         TeacherDto teacherdto = teacherService.getTeacherById(id);
+        System.out.println("!!!!!!!!!!!!Teacher ID: " + id);
+        System.out.println("!!!!!!!!!!!!Teacher DTO: " + teacherdto);
         Teacher teacher = teacherService.mapToEntity(teacherdto);
+        System.out.println("!!!!!!!!!!!!Teacher Entity: " + teacher);
     List<FicheDeVoeux> submittedFiches = ficheDeVoeuxService.findSubmittedFichesByTeacherId(teacher.getId());
-    List<FicheDeVoeuxDto> ficheDtos = submittedFiches.stream()
-        .map(p -> {return ficheDeVoeuxService.mapToDto(p);})
-        .collect(Collectors.toList());
+    System.out.println("!!!!!!!!!!!!Submitted Fiches: " + submittedFiches);
     
-    return ResponseEntity.ok(ficheDtos);
+    
+    return ResponseEntity.ok(submittedFiches);
 }
 @GetMapping("/teacher/fiche/{ficheId}")
 @PreAuthorize("hasRole('TEACHER')")

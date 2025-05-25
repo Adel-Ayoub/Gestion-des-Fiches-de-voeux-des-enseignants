@@ -148,9 +148,11 @@ public class FicheDeVoeuxService {
     }
 
 public List<FicheDeVoeux> findSubmittedFichesByTeacherId(Long teacherId) {
-    return ficheDeVoeuxRepository.findByTeacherId(
+    List<FicheDeVoeux> fiches =ficheDeVoeuxRepository.findByTeacherId(
         teacherId 
            );
+    System.out.println("!!!!!!!!!!!!Fiches: " + fiches);
+    return fiches;
 }
 
 public FicheDeVoeux findById(Long ficheId) {

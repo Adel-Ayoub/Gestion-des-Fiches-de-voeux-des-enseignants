@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Header } from '@/components/layout/Header';
 import { Badge } from "@/components/ui/badge";
 import Mailbox from '@/components/Mailbox';
-import WishsList from '@/components/wishes/WishesList';
+import {WishesList} from '@/components/wishes/WishesList';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   User, 
@@ -78,7 +78,7 @@ function ProfilePage() {
       console.log(userdto.data);
       const response = await axios.get("http://localhost:8080/api/teachers/user/"+parseInt(userdto.data.id), {headers: { Authorization: token}});
       console.log(response.data);
-      const res = await axios.get("http://localhost:8080/api/teachers/teacher/submitted-fiches/19", { headers: { Authorization: token } });
+      const res = await axios.get("http://localhost:8080/api/teachers/teacher/submitted-fiches/"+response.data.id, { headers: { Authorization: token } });
       setWishes(res.data);
       console.log(wishes);
 

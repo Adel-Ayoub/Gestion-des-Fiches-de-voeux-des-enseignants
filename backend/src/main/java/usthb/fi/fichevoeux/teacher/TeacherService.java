@@ -38,6 +38,7 @@ public class TeacherService {
             return null;
         }
         Teacher teacher = new Teacher();
+        teacher.setId(dto.getId());
         teacher.setUserId(dto.getUserId());
         teacher.setGrade(dto.getGrade());
         teacher.setOfficeNumber(dto.getOfficeNumber());
