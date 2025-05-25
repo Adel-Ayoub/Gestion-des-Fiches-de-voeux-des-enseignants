@@ -17,8 +17,7 @@ public interface FicheDeVoeuxRepository extends JpaRepository<FicheDeVoeux, Long
 
     Optional<FicheDeVoeux> findByTeacherIdAndAcademicYear(Long teacherId, String academicYear);
 
-    //List<FicheDeVoeux> findByTeacherIdSubmission(Long teacherId); find all previous teacher submission, we can have another one for a given year-semester
-
+    List<FicheDeVoeux> findByTeacherId(Long teacherId); 
     // will try to find another way of doing these operations
     /*@Query("SELECT DISTINCT fv.teacherId FROM FicheDeVoeux fv JOIN FicheChoice fc ON fv.id = fc.ficheId WHERE fc.moduleId = :moduleId AND fv.academicYear = :year AND fv.semester = :semester")
     Set<Long> findTeacherIdsWhoChoseModule(@Param("moduleId") Long moduleId, @Param("year") String academicYear, @Param("semester") String semester);*/

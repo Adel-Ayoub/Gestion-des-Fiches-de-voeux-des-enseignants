@@ -1,7 +1,14 @@
 import { Message } from '../components/Mailbox';
 import {jwtDecode} from 'jwt-decode';
+import axios from 'axios';
 // Configure your Spring API base URL here
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/messages';
+type teacher = {
+  id:number;
+  name:string;
+  email:string;
+  role:string;
+}
 
 class MailService {
   private async makeRequest(endpoint: string, options: RequestInit = {}) {
@@ -31,8 +38,16 @@ class MailService {
   async getInboxMessages(userId:number): Promise<Message[]> {
     try {
       // Adjust the endpoint to match your Spring API
-	console.log(jwtDecode(localStorage.getItem('jwt') || '{}'));
+	const token=localStorage.getItem('jwt');
       const messages = await this.makeRequest('/history/'+userId);
+      //add sender and recipient fields to the response
+      if(userId !==1){
+      Promise.all(messages.map(async (msg: any) => { const user=await axios.get("http://localhost:8080/api/users/"+msg.sender,{headers:{Authorization: token}});
+      const reciepent=await axios.get("http://localhost:8080/api/users/"+userId,{headers:{Authorization: token}});
+      msg.senderName=user.data.name;msg.recipientName=reciepent.data.name; return msg;}));}else{
+      Promise.all(messages.map(async (msg: any) => { const user=await axios.get("http://localhost:8080/api/users/"+msg.sender,{headers:{Authorization: token}});return {...msg,senderName:user.data.name,recipientName:'Admin'};}));}
+
+      
       return messages.map((msg: any) => ({
         id: msg.id,
         subject: msg.subject,
@@ -41,6 +56,8 @@ class MailService {
         recipient: msg.recipient,
         timestamp: msg.timestamp || msg.createdAt,
         isRead: msg.isRead || msg.read || false,
+        recipientName: msg?.recipientName || 'ADMIN',
+        senderName: msg?.senderName || 'Admin',
       }));
     } catch (error) {
       console.error('Error fetching inbox messages:', error);

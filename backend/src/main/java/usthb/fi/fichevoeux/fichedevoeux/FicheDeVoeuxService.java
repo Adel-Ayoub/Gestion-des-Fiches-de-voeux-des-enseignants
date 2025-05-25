@@ -21,8 +21,9 @@ public class FicheDeVoeuxService {
 
     private final FicheDeVoeuxRepository ficheDeVoeuxRepository;
     private final FicheChoiceRepository ficheChoiceRepository;
-
-    private FicheDeVoeuxDto mapToDto(FicheDeVoeux fiche) {
+    
+    @Transactional
+    public FicheDeVoeuxDto mapToDto(FicheDeVoeux fiche) {
         if (fiche == null) {
             return null;
         }
@@ -145,4 +146,22 @@ public class FicheDeVoeuxService {
             throw new RuntimeException("Could not update Fiche de Voeux with id " + id, e);
         }
     }
+
+public List<FicheDeVoeux> findSubmittedFichesByTeacherId(Long teacherId) {
+    return ficheDeVoeuxRepository.findByTeacherId(
+        teacherId 
+           );
 }
+
+public FicheDeVoeux findById(Long ficheId) {
+    return ficheDeVoeuxRepository.findById(ficheId)
+        .orElseThrow(() -> new ResourceNotFoundException("Fiche not found with id: " + ficheId));
+}
+
+// Add this enum if not already present
+public enum FicheStatus {
+    DRAFT,
+    SUBMITTED,
+    APPROVED,
+    REJECTED
+}}

@@ -96,7 +96,7 @@ export const Inbox = ({ messages, onMarkAsRead, isLoading }: InboxProps) => {
                   <p className={`text-sm font-medium truncate ${
                     message.isRead ? 'text-gray-900' : 'text-blue-900'
                   }`}>
-                    From: Admin
+                    From: {message.sender || 'Admin'}
                   </p>
                   <span className="text-xs text-gray-500 ml-2">
                     {formatDate(message.timestamp)}

@@ -33,7 +33,7 @@ public class TeacherService {
         );
     }
 
-    private Teacher mapToEntity(TeacherDto dto) {
+    public Teacher mapToEntity(TeacherDto dto) {
         if (dto == null) {
             return null;
         }

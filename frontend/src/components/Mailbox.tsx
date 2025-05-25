@@ -16,6 +16,8 @@ export interface Message {
   recipient: string;
   timestamp: string;
   isRead: boolean;
+  senderName?: string; // Optional, for display purposes
+  recipientName?: string; // Optional, for display purposes
 }
 interface MailboxProps {
   userId: number;
@@ -54,7 +56,7 @@ const Mailbox = ({ userId }: MailboxProps) => {
 
   const handleSendMessage = async (subject: string, content: string) => {
     try {
-      await mailService.sendMessage(10,subject, content, false);
+      await mailService.sendMessage(userId,subject, content, false);
       toast({
         title: "Message sent",
         description: "Your message has been sent to the admin",
@@ -88,6 +90,10 @@ const Mailbox = ({ userId }: MailboxProps) => {
   };
 
   useEffect(() => {
+    if (!userId){ 
+      console.error('User ID is required to fetch messages');
+      console.log(userId);
+      return;}
     fetchMessages();
   }, [userId]);
 
