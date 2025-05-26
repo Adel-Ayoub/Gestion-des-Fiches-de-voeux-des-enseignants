@@ -1,0 +1,263 @@
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  min-height: 100vh;
+  background-color: #fff;
+  flex-direction: column;
+  width: 100%;
+  margin: auto;
+  color: #000;
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.section {
+  width: 90%;
+  max-width: 900px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 10px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.section label {
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.section label::after {
+  content: "*";
+  color: red;
+  margin-left: 5px;
+}
+
+.section .optional::after {
+  content: "";
+}
+
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
+.choiseTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background-color: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.choiseTable thead {
+  background-color: #f0f0f0;
+}
+
+.choiseTable th,
+.choiseTable td {
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.choiseTable th:nth-child(1),
+.choiseTable td:nth-child(1) {
+  width: 80px;
+}
+
+.choiseTable th:nth-child(2),
+.choiseTable td:nth-child(2) {
+  width: 50%;
+}
+
+.choiseTable th:nth-child(3),
+.choiseTable td:nth-child(3) {
+  width: 80px;
+}
+
+.choiseTable th:nth-child(4),
+.choiseTable td:nth-child(4) {
+  width: 100px;
+}
+
+.choiseTable th:nth-child(5),
+.choiseTable td:nth-child(5) {
+  width: 100px;
+}
+
+.choiseTable select {
+  width: calc(100% - 10px);
+  max-width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 13px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.choiseTable select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.choiseTable td:nth-child(2) select {
+  width: calc(100% - 10px);
+  max-width: 250px;
+}
+
+.choiseTable input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.gradeRadio {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gradeRadio label::after {
+  content: "";
+}
+
+.section input {
+  background-color: #fff;
+  border-radius: 5px;
+  border: none;
+  padding: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+}
+
+.section .gradeRadio label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.section .gradeRadio label input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 10px;
+  background-color: #fff;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.section .gradeRadio label input[type="radio"]:checked::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #007bff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.section .gradeRadio label input[type="radio"]:checked {
+  border-color: #007bff;
+}
+
+.section .gradeRadio label input[type="radio"]:checked + span {
+  color: #007bff;
+}
+
+.section .gradeRadio label:hover {
+  color: #007bff;
+}
+
+.section .gradeRadio label input[type="radio"]:hover {
+  border-color: #007bff;
+}
+
+.section .extraRadio label::after {
+  content: "";
+}
+
+.section input::placeholder {
+  color: #999;
+}
+
+.section table tbody tr {
+  border-top: 1px solid #ccc;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  .choiseTable {
+    font-size: 12px;
+  }
+
+  .choiseTable th,
+  .choiseTable td {
+    padding: 6px 4px;
+  }
+
+  .choiseTable select {
+    font-size: 12px;
+    padding: 2px 4px;
+  }
+}
+
+.section::-webkit-scrollbar {
+  height: 8px;
+}
+
+.section::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.section::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.section::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
