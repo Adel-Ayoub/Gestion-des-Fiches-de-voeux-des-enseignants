@@ -25,7 +25,7 @@ public class AdminExportController {
     private final AdminExportService adminExportService;
 
     @GetMapping("/fiche/{ficheId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<Resource> exportYearlyFicheVoeuxById(
             @PathVariable Long ficheId,
             @RequestParam String format) {
@@ -41,7 +41,7 @@ public class AdminExportController {
     }
 
     @GetMapping("/teacher/{teacherId}/year/{academicYear}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<Resource> exportTeacherYearlyVoeux(
             @PathVariable Long teacherId,
             @PathVariable String academicYear,

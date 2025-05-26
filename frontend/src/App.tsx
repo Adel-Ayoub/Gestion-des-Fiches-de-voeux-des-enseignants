@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import TeacherDetail from "./components/teachers/TeacherDetail";
 import {WishDetail} from "./components/wishes/WishDetail";
 import {Compose} from "./components/mailbox/Compose";
+import FicheViewPage from "./components/FicheViewPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/form" element={<Form />}/>
           <Route path="/profile" element={<ProfilePage/>} />
+          <Route path="/fiche/:ficheId" element={<FicheViewPage/>} />
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
