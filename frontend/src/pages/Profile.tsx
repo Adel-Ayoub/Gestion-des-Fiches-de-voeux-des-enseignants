@@ -35,6 +35,7 @@ type teacher = {
   departmentName:string;
   email?:string;
   role?:string;
+  personelEmail?:string;
 }
 
   
@@ -105,7 +106,7 @@ function ProfilePage() {
     
 };
 
-
+  const grades = [ "PROF","MAB", "MAA", "MC", "MCA", "MCB", "MCC", "MCD", "MCE", "MCE1", "MCE2", "MCE3", "MCE4", "MCE5", "MCE6"];
   const handleSettingsUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     alert("Paramètres enregistrés avec succès !");
@@ -158,8 +159,8 @@ function ProfilePage() {
                       <Input id="name" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} />
+                      <Label htmlFor="emailpersonel">Email personel</Label>
+                      <Input id="email" type="email" value={user.personelEmail} onChange={(e) => setUser({ ...user, personelEmail: e.target.value })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="rank">Grade</Label>
@@ -173,11 +174,7 @@ function ProfilePage() {
                       <Label htmlFor="officeNumber">Bureau</Label>
                       <Input id="officeNumber" value={user.officeNumber} onChange={(e) => setUser({ ...user, officeNumber: e.target.value })} />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="role">Role</Label>
-                      <Input id="role" value={user.role} onChange={(e) => setUser({ ...user, role: e.target.value })} />
-                    </div>
-                  </div>
+                                      </div>
                   
                   <Button onClick={handleProfileUpdate} className="space-y-3">Mettre à jour le profil</Button>
                 </form>
@@ -208,23 +205,6 @@ function ProfilePage() {
               <CardContent>
                 <form onSubmit={handleSettingsUpdate} className="space-y-4">
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Notifications par Email</Label>
-                      <div className="space-y-2">
-                        <label className="flex items-center space-x-2">
-                          <input type="checkbox" className="rounded" />
-                          <span>Mises à jour du statut des formulaires</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input type="checkbox" className="rounded" />
-                          <span>Annonces administratives</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input type="checkbox" className="rounded" />
-                          <span>Messages de support</span>
-                        </label>
-                      </div>
-                    </div>
                     <div className="space-y-2">
                       <Label htmlFor="currentPassword">Mot de passe actuel</Label>
                       <Input id="currentPassword" type="password" />

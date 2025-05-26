@@ -43,15 +43,10 @@ export const AppSidebar = () => {
     },
     { 
       icon: BookOpen, 
-      label: 'Courses', 
-      path: '/admin/courses' 
+      label: 'Mailbox', 
+      path: '/admin/mailbox' 
     },
-    { 
-      icon: Settings, 
-      label: 'Settings', 
-      path: '/admin/settings' 
-    },
-  ];
+      ];
   
   return (
     <Sidebar className="border-r border-gray-200">

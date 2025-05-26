@@ -151,7 +151,6 @@ public List<FicheDeVoeux> findSubmittedFichesByTeacherId(Long teacherId) {
     List<FicheDeVoeux> fiches =ficheDeVoeuxRepository.findByTeacherId(
         teacherId 
            );
-    System.out.println("!!!!!!!!!!!!Fiches: " + fiches);
     return fiches;
 }
 

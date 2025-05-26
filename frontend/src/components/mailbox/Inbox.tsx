@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Mail, MailOpen } from 'lucide-react';
 import { Message } from '../Mailbox';
 import { MessageDetail } from './MessageDetail';
-
+import {useEffect} from 'react';
+import {jwtDecode} from 'jwt-decode';
 interface InboxProps {
   messages: Message[];
   onMarkAsRead: (messageId: number) => void;
@@ -14,7 +15,12 @@ interface InboxProps {
 
 export const Inbox = ({ messages, onMarkAsRead, isLoading }: InboxProps) => {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-
+  const [isTeacher, setIsTeacher] = useState(false);
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    const decodedToken = jwtDecode(token);
+    setIsTeacher(decodedToken.roles === 'ROLE_TEACHER');
+}, []);
   const handleMessageClick = (message: Message) => {
     setSelectedMessage(message);
     if (!message.isRead) {
@@ -96,7 +102,7 @@ export const Inbox = ({ messages, onMarkAsRead, isLoading }: InboxProps) => {
                   <p className={`text-sm font-medium truncate ${
                     message.isRead ? 'text-gray-900' : 'text-blue-900'
                   }`}>
-                    From: {message.sender || 'Admin'}
+                    From: {message.senderName || 'Admin'}
                   </p>
                   <span className="text-xs text-gray-500 ml-2">
                     {formatDate(message.timestamp)}

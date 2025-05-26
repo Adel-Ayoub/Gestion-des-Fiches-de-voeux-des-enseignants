@@ -6,8 +6,9 @@ import { Inbox } from './mailbox/Inbox';
 import { Sent } from './mailbox/Sent';
 import { Compose } from './mailbox/Compose';
 import { mailService } from '../services/mailService';
-import { useToast } from '@/hooks/use-toast';
-
+import { useToast,Toast } from '@/hooks/use-toast';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 export interface Message {
   id: number;
   subject: string;
@@ -21,8 +22,29 @@ export interface Message {
 }
 interface MailboxProps {
   userId: number;
+  compose?: boolean; // Optional prop to control the initial tab
 }
-const Mailbox = ({ userId }: MailboxProps) => {
+export async function handleSendMessage(recipient:number,subject: string, content: string)  {
+   
+try {
+      const token = localStorage.getItem('jwt');
+      const decodedToken = jwtDecode(token);
+            const isAdmin = decodedToken.roles === 'ROLE_ADMIN';
+      const userId = await axios.get("http://localhost:8080/api/users/by-email", {
+        headers: { Authorization: token },
+        params: { email: decodedToken.sub }
+      });
+      await mailService.sendMessage(recipient,userId.data.id,subject, content, isAdmin);
+           // Refresh sent messages
+      
+      return true;
+    } catch (error) {
+      console.error('Error sending message:', error);
+            return false;
+    }
+  };
+
+const Mailbox = ({ userId,compose=true }: MailboxProps) => {
   const [inboxMessages, setInboxMessages] = useState<Message[]>([]);
   const [sentMessages, setSentMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,28 +76,7 @@ const Mailbox = ({ userId }: MailboxProps) => {
     }
   };
 
-  const handleSendMessage = async (subject: string, content: string) => {
-    try {
-      await mailService.sendMessage(userId,subject, content, false);
-      toast({
-        title: "Message sent",
-        description: "Your message has been sent to the admin",
-      });
-      // Refresh sent messages
-      const sent = await mailService.getSentMessages(userId);
-      setSentMessages(sent);
-      return true;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
+  
   const markAsRead = async (messageId: number) => {
     try {
       await mailService.markAsRead(messageId);
@@ -127,8 +128,8 @@ const Mailbox = ({ userId }: MailboxProps) => {
 
       <div className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100">
-            <TabsTrigger value="inbox" className="relative">
+          <TabsList className="flex  w-full  bg-gray-100">
+            <TabsTrigger value="inbox" className={` ${compose ? 'w-1/3' : 'w-1/2'}`}>
               Inbox
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -136,8 +137,9 @@ const Mailbox = ({ userId }: MailboxProps) => {
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="sent">Sent</TabsTrigger>
-            <TabsTrigger value="compose">Compose</TabsTrigger>
+            <TabsTrigger value="sent" className={` ${compose ? 'w-1/3' : 'w-1/2'}`}>Sent</TabsTrigger>
+
+            {compose &&<TabsTrigger value="compose" className={` ${compose ? 'w-1/3' : 'w-1/2'}`}>Compose</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="inbox" className="mt-6">
@@ -154,16 +156,15 @@ const Mailbox = ({ userId }: MailboxProps) => {
               isLoading={isLoading}
             />
           </TabsContent>
-
+          {compose &&(
           <TabsContent value="compose" className="mt-6">
             <Compose 
-              onSendMessage={handleSendMessage}
+              onSendMessage={handleSendMessage} 
             />
-          </TabsContent>
+          </TabsContent>)}
         </Tabs>
       </div>
     </div>
   );
 };
-
 export default Mailbox;

@@ -16,6 +16,7 @@ import ProfilePage from '@/pages/Profile';
 import Login from "./pages/Login";
 import TeacherDetail from "./components/teachers/TeacherDetail";
 import {WishDetail} from "./components/wishes/WishDetail";
+import {Compose} from "./components/mailbox/Compose";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -34,7 +35,8 @@ const App = () => (
             <Route path="teachers/:id" element={<TeacherDetail />} />
             <Route path="wishes" element={<Wishes />} />
             <Route path="wishes/:id" element={<WishDetail />} />
-            <Route path="courses" element={<Courses />} />
+            <Route path="mailbox" element={<Courses />} />
+            <Route path="mailbox/compose/:recipientId" element={<Compose />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/form" element={<Form />}/>

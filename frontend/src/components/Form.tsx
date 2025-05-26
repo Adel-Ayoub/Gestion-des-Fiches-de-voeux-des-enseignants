@@ -8,6 +8,7 @@ import { useState,useEffect } from 'react';
 import { motion,AnimatePresence } from 'framer-motion';
 import {Header} from './layout/Header';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
 type course = {
     id: number;
     moduleName: string;
@@ -240,7 +241,10 @@ useEffect(() => {
 const handleCancel = () => {
   navigate('/profile');
 }
-const handleFinalSubmit = () => {
+const handleFinalSubmit =  () => {
+  const token = localStorage.getItem("jwt");
+  const decodedToken = jwtDecode(token);
+  console.log("Decoded token:", decodedToken);
   const academicYear = `${currentYear}/${currentYear + 1}`;
   const payload: fichedeveoux = {
     academicYear,
@@ -252,12 +256,12 @@ const handleFinalSubmit = () => {
     semester1Choices: semester1choices,
     semester2Choices: semester2choices,
   };
-
-  axios.post("http://localhost:8080/api/fiches-de-voeux/submissions/yearly", payload, {
+    axios.post("http://localhost:8080/api/fiches-de-voeux/submissions/yearly", payload, {
     headers: { authorization: localStorage.getItem("jwt") }
-  }).then(res => console.log("Success", res))
-    .catch(err => console.error("Error", err));
+  }).catch(err => console.error("Error", err));
 };
+ 
+  
 const renderChoiceTable = (semester: 'S1' | 'S2', choices: fichechoice[], setFn: typeof handleChoiceChange,filteredCourses:course[]) => (
     <table className="choise-table">
       <thead>

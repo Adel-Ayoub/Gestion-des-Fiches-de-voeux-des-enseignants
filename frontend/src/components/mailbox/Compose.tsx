@@ -5,17 +5,31 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Send, User } from 'lucide-react';
-
+import {useEffect} from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
+import {handleSendMessage} from '@/components/Mailbox';
 interface ComposeProps {
-  onSendMessage: (subject: string, content: string) => Promise<boolean>;
+onSendMessage: (recipientId:string,subject: string, content: string) => Promise<boolean>;
 }
 
-export const Compose = ({ onSendMessage }: ComposeProps) => {
+export const Compose = ({ onSendMessage=handleSendMessage }: ComposeProps) => {
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
+  const [recipient, setRecipient] = useState<string>("");
   const [isSending, setIsSending] = useState(false);
-
-  const handleSend = async (e: React.FormEvent) => {
+  const {recipientId} = useParams();
+  console.log(recipientId);
+   useEffect(() => {
+    // Reset fields when component mountos
+    const token = localStorage.getItem('jwt');
+    const decodedToken = jwtDecode(token);
+    console.log(recipientId);
+    axios.get('http://localhost:8080/api/teachers/'+recipientId, { headers: { Authorization: token }  }).then((response) => { axios.get('http://localhost:8080/api/users/'+response.data.userId, { headers: { Authorization: token } }).then((response) => {setRecipient(response.data.name);});})
+}, [recipientId]);
+    
+        const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!subject.trim() || !content.trim()) {
@@ -23,10 +37,14 @@ export const Compose = ({ onSendMessage }: ComposeProps) => {
     }
 
     setIsSending(true);
-    const success = await onSendMessage(subject.trim(), content.trim());
+    const success = await onSendMessage(recipientId,subject.trim(), content.trim());
     
     if (success) {
       setSubject('');
+
+
+
+
       setContent('');
     }
     
@@ -34,7 +52,7 @@ export const Compose = ({ onSendMessage }: ComposeProps) => {
   };
 
   return (
-    <div className="max-w-2xl">
+    <div className={`max-w-2xl ${recipientId ? 'mx-auto' : 'mx-4'} p-6 bg-white rounded-lg shadow-md`}>
       <div className="flex items-center space-x-3 mb-6">
         <Send className="w-6 h-6 text-blue-600" />
         <h2 className="text-lg font-semibold text-gray-900">Compose Message</h2>
@@ -45,8 +63,8 @@ export const Compose = ({ onSendMessage }: ComposeProps) => {
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
             <User className="w-5 h-5 text-gray-600" />
             <div>
-              <p className="text-sm font-medium text-gray-900">To: Admin</p>
-              <p className="text-xs text-gray-600">System Administrator</p>
+              <p className="text-sm font-medium text-gray-900">To: {recipient}</p>
+              <p className="text-xs text-gray-600">{recipient =='Admin User' ? "System Administrator": "Teacher User"}</p>
             </div>
           </div>
 

@@ -1,6 +1,7 @@
 import { Message } from '../components/Mailbox';
 import {jwtDecode} from 'jwt-decode';
 import axios from 'axios';
+import { handleSendMessage } from '@/components/Mailbox';
 // Configure your Spring API base URL here
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/messages';
 type teacher = {
@@ -52,7 +53,7 @@ class MailService {
         id: msg.id,
         subject: msg.subject,
         content: msg.content,
-        sender: msg.sender || 'admin',
+        userId: msg.sender || '1',
         recipient: msg.recipient,
         timestamp: msg.timestamp || msg.createdAt,
         isRead: msg.isRead || msg.read || false,
@@ -86,7 +87,7 @@ class MailService {
     }
   }
 
-  async sendMessage(userId:number,subject: string, content: string,isAdmin:Boolean): Promise<void> {
+  async sendMessage(userId:number,sender:string,subject: string, content: string,isAdmin:Boolean): Promise<void> {
     try {
       // Adjust the endpoint and payload to match your Spring API
       await this.makeRequest('', {
@@ -95,7 +96,7 @@ class MailService {
           content,
           is_admin:isAdmin,
           subject,
-          sender:`${userId}`,
+          sender,
           recipient: 'admin',// Always sending to admin
           userId: userId, // Assuming userId is the ID of the sender
 }),

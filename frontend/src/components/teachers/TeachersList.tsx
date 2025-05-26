@@ -98,7 +98,10 @@ export const TeachersList = () => {
   const [newTeacherRank, setNewTeacherRank] = useState('');
   const [newTeacherDepartment, setNewTeacherDepartment] = useState('');
   const [newTeacherOfficeNumber, setNewTeacherOfficeNumber] = useState('');
-  
+  const handleCompose = (teacher: Teacher) => {
+    navigate(`/admin/mailbox/compose/${teacher.id}`);   
+}
+      
 const filteredTeachers = teachersList.filter(teacher => {
     const matchesSearch = teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -316,16 +319,10 @@ const addedteacher :Teacher = {id:res.data.id,...newTeacher}  as Teacher;
                         variant="outline" 
                         size="icon"
                         onClick={() => {
-                          setCurrentTeacher(teacher);
-                          setNewTeacherName(teacher.name);
-                          setNewTeacherEmail(teacher.email);
-                          setNewTeacherRank(teacher.grade);
-                          setNewTeacherDepartment(teacher.departmentName);
-                          setNewTeacherOfficeNumber(teacher.officeNumber);
-                          setIsEditDialogOpen(true);
+                          handleCompose(teacher);
                         }}
                       >
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4 w-4"/>
                       </Button>
                       <Button 
                         variant="outline" 

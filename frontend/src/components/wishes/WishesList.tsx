@@ -159,6 +159,11 @@ const deleteFiche = () => {
             <p className="text-sm text-gray-700 mb-1"><span className="font-semibold">Comment:</span> {wish.comments}</p>
             <p className="text-xs text-gray-500"><span className="font-semibold">Created:</span> {new Date(wish.createdAt).toLocaleDateString()}</p>
           </div>
+          <div className="flex items-center  mx-auto"> 
+            <Badge className={`text-xs font-medium px-2 py-1 rounded ${wish.academicYear === `${currentYear}/${currentYear + 1}` ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+              {wish.academicYear}
+            </Badge>
+          </div>
           
           {/* Middle: grade*/}
           <div className="flex items-center gap-2 mr-8 max-h-[80vg] overflow-y-auto ">
@@ -205,16 +210,7 @@ export const WishesList = ({wishes}:{fichedeveoux}) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between flex-col md:flex-row gap-4">
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input 
-            placeholder="Search wishes..." 
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
+                
         <div className="flex gap-2">
           
           

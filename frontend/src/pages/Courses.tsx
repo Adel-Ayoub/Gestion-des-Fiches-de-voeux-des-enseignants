@@ -39,7 +39,7 @@ const [user, setUser] = useState<teacher>("");
  
   return (<>
 {loading ? <div>Loading...</div> :
-    <Mailbox userId={user.id}/>}</>
+    <Mailbox userId={user.id} compose={false}/>}</>
   );
 };
 

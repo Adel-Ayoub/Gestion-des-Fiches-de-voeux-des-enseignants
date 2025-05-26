@@ -17,6 +17,8 @@ import usthb.fi.fichevoeux.exception.ResourceNotFoundException;
 import usthb.fi.fichevoeux.fichedevoeux.dto.FicheSubmissionRequestDto;
 import usthb.fi.fichevoeux.user.User;
 import usthb.fi.fichevoeux.user.UserRepository;
+import usthb.fi.fichevoeux.teacher.Teacher;
+import usthb.fi.fichevoeux.teacher.TeacherRepository;
 
 import java.net.URI;
 import java.util.Map;
@@ -30,6 +32,7 @@ public class FicheDeVoeuxSubmissionController {
 
     private final FicheDeVoeuxSubmissionService ficheDeVoeuxSubmissionService;
     private final UserRepository userRepository;
+    private final TeacherRepository teacherRepository;
 
     @PostMapping("/yearly")
     @PreAuthorize("hasRole('TEACHER')")
@@ -45,7 +48,8 @@ public class FicheDeVoeuxSubmissionController {
                     logger.error("Authenticated user not found in database: {}", userEmail);
                     return new ResourceNotFoundException("Authenticated user data not found");
                 });
-        Long teacherUserIdForFiche = currentUser.getId();
+        Teacher currentTeacher = teacherRepository.findByuserId(currentUser.getId()).get();
+                        Long teacherUserIdForFiche = currentTeacher.getId();
 
         FicheDeVoeux processedFiche = ficheDeVoeuxSubmissionService.submitFicheDeVoeux(teacherUserIdForFiche, submissionRequestDto);
 
