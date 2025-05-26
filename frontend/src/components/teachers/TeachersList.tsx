@@ -132,18 +132,14 @@ const filteredTeachers = teachersList.filter(teacher => {
     const res= await axios.post('http://localhost:8080/api/users',createduser, { headers: { Authorization: localStorage.getItem('jwt') }});
     console.log(res.data);
     const newTeacher = {
-      id:0,
       userId: res.data.id,
       name: newTeacherName,
-      email: newTeacherEmail,
       grade: newTeacherRank,
     
       departmentName: newTeacherDepartment,
       officeNumber: newTeacherOfficeNumber,
-      avatar: "/placeholder.svg",
     };
-const addedteacher :Teacher = {id:res.data.id,...newTeacher}  as Teacher;
-    const response = await axios.post('http://localhost:8080/api/teachers', addedteacher, { headers: { Authorization: localStorage.getItem('jwt') } });
+    const response = await axios.post('http://localhost:8080/api/teachers', newTeacher, { headers: { Authorization: localStorage.getItem('jwt') } });
     setTeachersList([...teachersList, newTeacher]);
     resetForm();
     setIsAddDialogOpen(false);
