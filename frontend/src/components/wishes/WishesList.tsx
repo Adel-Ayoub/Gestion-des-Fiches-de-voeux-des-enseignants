@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { saveAs } from 'file-saver';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -204,15 +205,44 @@ const deleteFiche = () => {
 };
 
 export const WishesList = ({wishes}:{fichedeveoux}) => {
+  const [isTeacher, setIsTeacher] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
+    useEffect(()=>{
+
+      const token = localStorage.getItem("jwt");
+      const decoded = jwtDecode(token);
+      if(decoded.roles=="ROLE_TEACHER"){
+        setIsTeacher(true);
+      }
+
+
+
+
+    }, []);
   const filteredWishes = wishes;  
+const handleExportAll = async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/api/admin/export/2025/2026', { headers:{ Authorization: localStorage.getItem("jwt")},
+      responseType: 'blob', // Important!
+    });
+
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+
+    saveAs(blob, 'data.xlsx');
+  } catch (error) {
+    console.error("Error downloading Excel file", error);
+  }
+};
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between flex-col md:flex-row gap-4">
                 
         <div className="flex gap-2">
-          
+          { !isTeacher &&<Button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={handleExportAll}> export tout les fiches </Button>}
           
 {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>

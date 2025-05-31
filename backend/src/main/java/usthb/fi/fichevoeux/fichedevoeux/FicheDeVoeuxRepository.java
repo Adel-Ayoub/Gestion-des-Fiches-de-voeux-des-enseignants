@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import usthb.fi.fichevoeux.teacher.Teacher;
+// import usthb.fi.fichevoeux.teacher.Teacher; // Not directly used in queries here
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +17,10 @@ public interface FicheDeVoeuxRepository extends JpaRepository<FicheDeVoeux, Long
 
     Optional<FicheDeVoeux> findByTeacherIdAndAcademicYear(Long teacherId, String academicYear);
 
-    List<FicheDeVoeux> findByTeacherId(Long teacherId); 
+    List<FicheDeVoeux> findByTeacherId(Long teacherId);
+
+    List<FicheDeVoeux> findByAcademicYear(String academicYear);
+
     // will try to find another way of doing these operations
     /*@Query("SELECT DISTINCT fv.teacherId FROM FicheDeVoeux fv JOIN FicheChoice fc ON fv.id = fc.ficheId WHERE fc.moduleId = :moduleId AND fv.academicYear = :year AND fv.semester = :semester")
     Set<Long> findTeacherIdsWhoChoseModule(@Param("moduleId") Long moduleId, @Param("year") String academicYear, @Param("semester") String semester);*/

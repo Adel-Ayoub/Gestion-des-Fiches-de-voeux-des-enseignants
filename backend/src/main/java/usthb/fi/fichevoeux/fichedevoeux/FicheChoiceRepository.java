@@ -14,6 +14,9 @@ public interface FicheChoiceRepository extends JpaRepository<FicheChoice, Long> 
     List<FicheChoice> findByFicheId(Long ficheId);
     List<FicheChoice> findByModuleId(Long moduleId);
 
+    List<FicheChoice> findByFicheIdIn(List<Long> ficheIds);
+    void deleteAllByFicheId(Long ficheId);
+
     //List<FicheChoice> findByModuleId_Year_Semester(Long moduleId, String Year, String semester);
 
     /* @Query("SELECT fc FROM FicheChoice fc JOIN FicheDeVoeux fv ON fc.ficheId = fv.id WHERE fv.academicYear = :year AND fv.semester = :semester")
