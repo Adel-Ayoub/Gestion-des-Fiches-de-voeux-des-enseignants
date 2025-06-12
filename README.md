@@ -28,16 +28,16 @@ The application is primarily accessed through a web interface, with different fu
 
 ### On Windows
 
-> W.I.P (Deployment likely involves running a JAR file or deploying to a web server)
+> W.I.P (Deployment to a web server)
 
 ### On Linux
 
-> W.I.P (Deployment likely involves running a JAR file, using Docker, or deploying to a web server)
+> W.I.P (Deployment to a web server)
 
 ### From Source
 
 You can clone this repository using the git CLI.
-After that, assuming a **Spring Boot with Maven** setup (adjust if using Gradle or Go), you can use commands like:
+After that, assuming a **Spring Boot with Maven** setup, you can use commands like:
 
 | Command         | Arguments              | Description                                                           |
 | --------------- | ---------------------- | --------------------------------------------------------------------- |
